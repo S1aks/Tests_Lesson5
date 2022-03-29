@@ -119,14 +119,12 @@ class BehaviorTest {
         editText.text = "UiAutomator"
         val searchButton = uiDevice.findObject(By.res(packageName, "searchButton"))
         searchButton.click()
-        uiDevice.waitForIdle(TIMEOUT)
-
-        val toDetails: UiObject2 = uiDevice.findObject(
-            By.res(
-                packageName,
-                "toDetailsActivityButton"
-            )
+        uiDevice.wait(
+            Until.findObject(By.res(packageName, "totalCountTextView")),
+            TIMEOUT
         )
+        val toDetails: UiObject2 = uiDevice.findObject(
+            By.res(packageName, "toDetailsActivityButton"))
         toDetails.click()
         val changedText =
             uiDevice.wait(
@@ -134,10 +132,62 @@ class BehaviorTest {
                 TIMEOUT
             )
         if (BuildConfig.TYPE == MainActivity.FAKE) {
-            Assert.assertEquals(changedText.text.toString(), "Number of results: 42")
+            Assert.assertEquals("Number of results: 42", changedText.text)
         } else {
-            Assert.assertEquals(changedText.text.toString(), "Number of results: 701")
+            Assert.assertEquals("Number of results: 701", changedText.text)
         }
+        Assert.assertNotEquals("Number of results: 0", changedText.text)
+        Assert.assertNotEquals("", changedText.text)
+    }
+
+    @Test
+    fun test_CheckValidLayoutsObjectsIsReady() {
+        val editText = uiDevice.findObject(By.res(packageName, "searchEditText"))
+        Assert.assertNotNull(editText)
+        Assert.assertEquals("Enter keyword e.g. android", editText.text.toString())
+        val searchButton = uiDevice.findObject(By.res(packageName, "searchButton"))
+        Assert.assertNotNull(searchButton)
+        Assert.assertEquals("SEARCH", searchButton.text.toString())
+        val toDetailsButton: UiObject2 =
+            uiDevice.findObject(By.res(packageName, "toDetailsActivityButton"))
+        Assert.assertNotNull(toDetailsButton)
+        Assert.assertEquals("TO DETAILS", toDetailsButton.text.toString())
+        toDetailsButton.click()
+        val counterTextView =
+            uiDevice.wait(
+                Until.findObject(By.res(packageName, "totalCountTextView")),
+                TIMEOUT
+            )
+        Assert.assertNotNull(counterTextView)
+        Assert.assertEquals("Number of results: 0", counterTextView.text.toString())
+        val decrementButton: UiObject2 =
+            uiDevice.findObject(By.res(packageName, "decrementButton"))
+        Assert.assertNotNull(decrementButton)
+        Assert.assertEquals("-", decrementButton.text.toString())
+        val incrementButton: UiObject2 =
+            uiDevice.findObject(By.res(packageName, "incrementButton"))
+        Assert.assertNotNull(incrementButton)
+        Assert.assertEquals("+", incrementButton.text.toString())
+    }
+
+    @Test
+    fun test_CheckDetailsActivityButtonsIsWorked() {
+        val toDetailsButton: UiObject2 =
+            uiDevice.findObject(By.res(packageName, "toDetailsActivityButton"))
+        toDetailsButton.click()
+        val counterTextView =
+            uiDevice.wait(
+                Until.findObject(By.res(packageName, "totalCountTextView")),
+                TIMEOUT
+            )
+        val decrementButton: UiObject2 =
+            uiDevice.findObject(By.res(packageName, "decrementButton"))
+        decrementButton.click()
+        Assert.assertEquals("Number of results: -1", counterTextView.text.toString())
+        val incrementButton: UiObject2 =
+            uiDevice.findObject(By.res(packageName, "incrementButton"))
+        incrementButton.click()
+        Assert.assertEquals("Number of results: 0", counterTextView.text.toString())
     }
 
     companion object {
